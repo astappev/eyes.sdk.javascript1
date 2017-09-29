@@ -7,12 +7,15 @@ const DebugScreenshotsProvider = require('./DebugScreenshotsProvider');
 /**
  * A debug screenshot provider for saving screenshots to file.
  */
-class NullDebugScreenshotProvider extends DebugScreenshotsProvider {
+class FileDebugScreenshotProvider extends DebugScreenshotsProvider {
 
     /**
      * @private
      */
-    static DATE_FORMAT = "yyyy_mm_dd_HH_MM_ss_l";
+    static get DATE_FORMAT (){
+      return "yyyy_mm_dd_HH_MM_ss_l";
+    }
+
 
     // noinspection JSUnusedGlobalSymbols
     /**
@@ -30,8 +33,8 @@ class NullDebugScreenshotProvider extends DebugScreenshotsProvider {
      * @return {Promise<void>}
      */
     getFormattedTimeStamp() {
-        return dateformat(new Date(), this.DATE_FORMAT);
+        return dateformat(new Date(), FileDebugScreenshotProvider.DATE_FORMAT);
     }
 }
 
-module.exports = NullDebugScreenshotProvider;
+module.exports = FileDebugScreenshotProvider;

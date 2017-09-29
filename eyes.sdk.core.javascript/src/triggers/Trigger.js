@@ -12,12 +12,14 @@ class Trigger {
      * @readonly
      * @enum {String}
      */
-    static TriggerType = {
+    static get TriggerType () {
+        return {
         Unknown: 'Unknown',
         Mouse: 'Mouse',
         Text: 'Text',
         Keyboard: 'Keyboard',
-    };
+      };
+    }
 
     constructor() {
         if (new.target === Trigger) {

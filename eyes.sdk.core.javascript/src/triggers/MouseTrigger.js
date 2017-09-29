@@ -13,7 +13,8 @@ class MouseTrigger extends Trigger {
      * @readonly
      * @enum {String}
      */
-    static MouseAction = {
+    static get MouseAction () {
+      return {
         None: 'None',
         Click: 'Click',
         RightClick: 'RightClick',
@@ -21,7 +22,8 @@ class MouseTrigger extends Trigger {
         Move: 'Move',
         Down: 'Down',
         Up: 'Up'
-    };
+      };
+    }
 
     /**
      *

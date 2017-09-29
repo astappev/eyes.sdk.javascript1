@@ -6,11 +6,16 @@
  * @abstract
  */
 class DebugScreenshotsProvider {
-    static DEFAULT_PREFIX = "screenshot_";
-    static DEFAULT_PATH = "";
+  static get DEFAULT_PREFIX() {
+    return "screenshot_";
+  }
+
+  static get DEFAULT_PATH() {
+    return ""
+  };
 
     constructor() {
-        this._prefix = this.DEFAULT_PREFIX;
+        this._prefix = DebugScreenshotsProvider.DEFAULT_PREFIX;
         this._path = null;
     }
 
@@ -20,7 +25,7 @@ class DebugScreenshotsProvider {
     }
 
     setPrefix(value) {
-        this._prefix = value || this.DEFAULT_PREFIX;
+        this._prefix = value || DebugScreenshotsProvider.DEFAULT_PREFIX;
     }
 
     getPath() {
@@ -31,7 +36,7 @@ class DebugScreenshotsProvider {
         if (value) {
             value = value.endsWith("/") ? value : value + '/';
         } else {
-            value = this.DEFAULT_PATH;
+            value = DebugScreenshotsProvider.DEFAULT_PATH;
         }
 
         this._path = value;

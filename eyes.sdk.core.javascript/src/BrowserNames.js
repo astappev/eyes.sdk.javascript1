@@ -1,12 +1,29 @@
 'use strict';
 
 class BrowserNames {
-    static Edge = 'Edge';
-    static IE = 'IE';
-    static Firefox = 'Firefox';
-    static Chrome = 'Chrome';
-    static Safari = 'Safari';
-    static Chromium = 'Chromium';
+  static get Edge() {
+    return 'Edge';
+  }
+
+  static get IE() {
+    return 'IE';
+  }
+
+  static get Firefox() {
+    return 'Firefox';
+  }
+
+  static get Chrome() {
+    return 'Chrome';
+  }
+
+  static get Safari() {
+    return 'Safari';
+  }
+
+  static get Chromium() {
+    return 'Chromium';
+  }
 }
 
 module.exports = BrowserNames;

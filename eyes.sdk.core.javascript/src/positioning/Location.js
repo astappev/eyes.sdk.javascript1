@@ -8,7 +8,9 @@ const ArgumentGuard = require('../ArgumentGuard');
 class Location {
 
     // noinspection JSUnusedGlobalSymbols
-    static ZERO = new Location(0, 0);
+    static get ZERO () {
+      return new Location(0, 0);
+    }
 
     /**
      * Creates a Location instance.

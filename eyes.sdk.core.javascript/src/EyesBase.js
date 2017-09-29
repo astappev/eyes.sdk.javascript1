@@ -59,9 +59,17 @@ const TestResults = require('./server/TestResults');
  */
 class EyesBase {
 
-    static DEFAULT_EYES_SERVER = "https://eyesapi.applitools.com";
-    static DEFAULT_MATCH_TIMEOUT = 2000;
-    static USE_DEFAULT_TIMEOUT = -1;
+    static get DEFAULT_EYES_SERVER() {
+      return "https://eyesapi.applitools.com";
+    }
+
+    static get DEFAULT_MATCH_TIMEOUT() {
+      return 2000;
+    }
+
+    static get USE_DEFAULT_TIMEOUT() {
+      return -1;
+    }
 
     /** @type {Boolean} */ _shouldMatchWindowRunOnceOnTimeout;
 
@@ -166,7 +174,7 @@ class EyesBase {
         this._defaultMatchSettings = new ImageMatchSettings();
 
         this._serverConnector = new ServerConnector(this._promiseFactory, this._logger, serverUrl);
-        this._matchTimeout = this.DEFAULT_MATCH_TIMEOUT;
+        this._matchTimeout = EyesBase.DEFAULT_MATCH_TIMEOUT;
         this._failureReports = FailureReports.ON_CLOSE;
     }
 

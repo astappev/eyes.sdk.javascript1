@@ -323,6 +323,13 @@ class Region {
   }
 
   /**
+   * @return {boolean} {@code true} if the region`s size is 0; {@code false} otherwise.
+   */
+  isSizeEmpty() {
+    return (this.getWidth() === Region.EMPTY.getWidth() || this.getHeight() === Region.EMPTY.getHeight());
+  }
+
+  /**
    * Get a Region translated by the specified amount.
    *
    * @param {number} dx The amount to offset the x-coordinate.
@@ -484,7 +491,7 @@ class Region {
 
   /** @override */
   toString() {
-    return `(${this._left}, ${this._top}) ${this._width}x${this._height}, ${true._coordinatesType}`;
+    return `(${this._left}, ${this._top}) ${this._width}x${this._height}, ${this._coordinatesType}`;
   }
 }
 

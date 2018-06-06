@@ -7,9 +7,9 @@ const { GeneralUtils } = require('../utils/GeneralUtils');
  */
 class RenderStatusResults {
   constructor() {
-    this._status = null;
-    this._imageLocation = null;
-    this._error = null;
+    this._status = undefined;
+    this._imageLocation = undefined;
+    this._error = undefined;
   }
 
   /**
@@ -18,6 +18,11 @@ class RenderStatusResults {
    */
   static fromObject(object) {
     return GeneralUtils.assignTo(new RenderStatusResults(), object);
+  }
+
+  /** @return {boolean} */
+  isEmpty() {
+    return (this._status === undefined && this._imageLocation === undefined && this._error === undefined);
   }
 
   /** @return {RenderStatus} */

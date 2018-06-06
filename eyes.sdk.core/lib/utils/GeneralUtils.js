@@ -38,7 +38,7 @@ class GeneralUtils {
 
     for (let i = 0, l = suffixes.length; i < l; i += 1) {
       /** @type {string} */
-      const suffix = suffixes[i];
+      const suffix = String(suffixes[i]);
       if (!suffix.startsWith('/') && !(i === l - 1 && suffix.startsWith('?'))) {
         concatUrl += '/';
       }

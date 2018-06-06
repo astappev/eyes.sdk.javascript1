@@ -115,13 +115,12 @@ class EyesBase {
     this._failureReports = FailureReports.ON_CLOSE;
     /** @type {ImageMatchSettings} */
     this._defaultMatchSettings = new ImageMatchSettings();
+    this._defaultMatchSettings.setIgnoreCaret(true);
 
     /** @type {Trigger[]} */
     this._userInputs = [];
     /** @type {PropertyData[]} */
     this._properties = [];
-    /** @type {boolean} */
-    this._render = false;
 
     /** @type {boolean} */
     this._useImageDeltaCompression = true;
@@ -154,6 +153,8 @@ class EyesBase {
 
     /** @type {boolean} */ this._isOpen = undefined;
     /** @type {string} */ this._agentId = undefined;
+    /** @type {boolean} */ this._render = false;
+    /** @type {boolean} */ this._saveDiffs = undefined;
 
     /** @type {SessionType} */ this._sessionType = undefined;
     /** @type {string} */ this._testName = undefined;
@@ -185,22 +186,41 @@ class EyesBase {
     this._autSessionId = undefined;
   }
 
-  /** @private */
-  _initProviders() {
-    // TODO: do we need to reset all the providers when user call to open? It may be unexpected.
-    /** @type {PropertyHandler<ScaleProvider>} */
-    this._scaleProviderHandler = new SimplePropertyHandler();
-    this._scaleProviderHandler.set(new NullScaleProvider());
-    /** @type {PositionProvider} */
-    this._positionProvider = new InvalidPositionProvider();
-    /** @type {PropertyHandler<RectangleSize>} */
-    this._viewportSizeHandler = new SimplePropertyHandler();
-    this._viewportSizeHandler.set(null);
+  // noinspection FunctionWithMoreThanThreeNegationsJS
+  /**
+   * @param {boolean} [hardReset=false] If false, init providers only if they're not initialized.
+   * @private
+   */
+  _initProviders(hardReset = false) {
+    if (hardReset) {
+      this._scaleProviderHandler = undefined;
+      this._cutProviderHandler = undefined;
+      this._positionProvider = undefined;
+      this._viewportSizeHandler = undefined;
+      this._debugScreenshotsProvider = undefined;
+    }
+
+    if (!this._scaleProviderHandler) {
+      /** @type {PropertyHandler<ScaleProvider>} */
+      this._scaleProviderHandler = new SimplePropertyHandler();
+      this._scaleProviderHandler.set(new NullScaleProvider());
+    }
 
     if (!this._cutProviderHandler) {
       /** @type {PropertyHandler<CutProvider>} */
       this._cutProviderHandler = new SimplePropertyHandler();
       this._cutProviderHandler.set(new NullCutProvider());
+    }
+
+    if (!this._positionProvider) {
+      /** @type {PositionProvider} */
+      this._positionProvider = new InvalidPositionProvider();
+    }
+
+    if (!this._viewportSizeHandler) {
+      /** @type {PropertyHandler<RectangleSize>} */
+      this._viewportSizeHandler = new SimplePropertyHandler();
+      this._viewportSizeHandler.set(null);
     }
 
     if (!this._debugScreenshotsProvider) {
@@ -373,8 +393,7 @@ class EyesBase {
    * @return {string} The current branch name.
    */
   getBranchName() {
-    // noinspection JSUnresolvedVariable
-    return this._branchName || process.env.APPLITOOLS_BRANCH;
+    return this._branchName;
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -392,8 +411,7 @@ class EyesBase {
    * @return {string} The name of the current parent branch under which new branches will be created.
    */
   getParentBranchName() {
-    // noinspection JSUnresolvedVariable
-    return this._parentBranchName || process.env.APPLITOOLS_PARENT_BRANCH;
+    return this._parentBranchName;
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -411,8 +429,7 @@ class EyesBase {
    * @return {string} The name of the baseline branch
    */
   getBaselineBranchName() {
-    // noinspection JSUnresolvedVariable
-    return this._baselineBranchName || process.env.APPLITOOLS_BASELINE_BRANCH;
+    return this._baselineBranchName;
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -600,10 +617,9 @@ class EyesBase {
 
   // noinspection JSUnusedGlobalSymbols
   /**
-   * @protected
    * @return {string} The full agent id composed of both the base agent id and the user given agent id.
    */
-  _getFullAgentId() {
+  getFullAgentId() {
     const agentId = this.getAgentId();
     if (!agentId) {
       return this.getBaseAgentId();
@@ -656,6 +672,13 @@ class EyesBase {
     } else {
       this._cutProviderHandler = new SimplePropertyHandler(new NullCutProvider());
     }
+  }
+
+  /**
+   * @return {boolean}
+   */
+  getIsCutProviderExplicitlySet() {
+    return this._cutProviderHandler && !(this._cutProviderHandler.get() instanceof NullCutProvider);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -714,6 +737,24 @@ class EyesBase {
    */
   getRender() {
     return this._render;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * Automatically save differences as a baseline.
+   *
+   * @param {boolean} saveDiffs Sets whether to automatically save differences as baseline.
+   */
+  setSaveDiffs(saveDiffs) {
+    this._saveDiffs = saveDiffs;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @return {boolean} whether to automatically save differences as baseline.
+   */
+  getSaveDiffs() {
+    return this._saveDiffs;
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -909,6 +950,7 @@ class EyesBase {
       that._logger.verbose(`${isAborted ? 'Aborting' : 'Closing'} server session...`);
       that._isOpen = false;
       that.clearUserInputs();
+      that._initProviders(true);
 
       // If a session wasn't started, use empty results.
       if (!that._runningSession) {
@@ -1290,20 +1332,21 @@ class EyesBase {
           that.getBaseAgentId(),
           that._sessionType,
           that.getAppName(),
-          null,
+          undefined,
           that._testName,
           that.getBatch(),
           that._baselineEnvName,
           that._environmentName,
           appEnvironment,
           that._defaultMatchSettings,
-          that.getBranchName(),
-          that.getParentBranchName(),
-          that.getBaselineBranchName(),
+          that._branchName || process.env.APPLITOOLS_BRANCH,
+          that._parentBranchName || process.env.APPLITOOLS_PARENT_BRANCH,
+          that._baselineBranchName || process.env.APPLITOOLS_BASELINE_BRANCH,
           that._compareWithParentBranch,
           that._ignoreBaseline,
-          that._properties,
-          that._render
+          that._render,
+          that._saveDiffs,
+          that._properties
         );
 
         const outputProvider = new AppOutputProvider();
@@ -1502,7 +1545,7 @@ class EyesBase {
 
       ArgumentGuard.notNull(testName, 'testName');
 
-      this._logger.verbose(`Agent = ${this._getFullAgentId()}`);
+      this._logger.verbose(`Agent = ${this.getFullAgentId()}`);
       this._logger.verbose(`openBase('${appName}', '${testName}', '${viewportSize}')`);
 
       this._validateApiKey();
@@ -1685,7 +1728,7 @@ class EyesBase {
     newControl = this._matchWindowTask
       .getLastScreenshot()
       .getIntersectedRegion(newControl, CoordinatesType.SCREENSHOT_AS_IS);
-    if (newControl.isEmpty()) {
+    if (newControl.isSizeEmpty()) {
       this._logger.verbose(`Ignoring '${text}' (out of bounds)`);
       return;
     }
@@ -1743,7 +1786,7 @@ class EyesBase {
       .getIntersectedRegion(control, CoordinatesType.SCREENSHOT_AS_IS);
 
     // If the region is NOT empty, we'll give the coordinates relative to the control.
-    if (!controlScreenshotIntersect.isEmpty()) {
+    if (!controlScreenshotIntersect.isSizeEmpty()) {
       const l = controlScreenshotIntersect.getLocation();
       cursorInScreenshot.offset(-l.getX(), -l.getY());
     }
@@ -1826,13 +1869,14 @@ class EyesBase {
           that._environmentName,
           appEnvironment,
           that._defaultMatchSettings,
-          that.getBranchName(),
-          that.getParentBranchName(),
-          that.getBaselineBranchName(),
+          that._branchName || process.env.APPLITOOLS_BRANCH,
+          that._parentBranchName || process.env.APPLITOOLS_PARENT_BRANCH,
+          that._baselineBranchName || process.env.APPLITOOLS_BASELINE_BRANCH,
           that._compareWithParentBranch,
           that._ignoreBaseline,
-          that._properties,
-          that._render
+          that._render,
+          that._saveDiffs,
+          that._properties
         );
 
         that._logger.verbose('Starting server session...');
@@ -1915,7 +1959,7 @@ class EyesBase {
             screenshot = newScreenshot;
 
             // Cropping by region if necessary
-            if (!region.isEmpty()) {
+            if (!region.isSizeEmpty()) {
               return screenshot.getSubScreenshot(region, false).then(subScreenshot => {
                 screenshot = subScreenshot;
                 return that._debugScreenshotsProvider.save(subScreenshot.getImage(), 'SUB_SCREENSHOT');
@@ -2103,6 +2147,13 @@ class EyesBase {
    */
   getPromiseFactory() {
     return this._promiseFactory;
+  }
+
+  /**
+   * @param {string} message
+   */
+  log(message) {
+    this._logger.log(message);
   }
 }
 

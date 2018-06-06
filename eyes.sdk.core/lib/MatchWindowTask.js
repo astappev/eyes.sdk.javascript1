@@ -336,7 +336,7 @@ class MatchWindowTask {
    * @param {Region} region
    */
   _updateBounds(region) {
-    if (region.isEmpty()) {
+    if (region.isSizeEmpty()) {
       if (this._lastScreenshot) {
         this._lastScreenshotBounds = new Region(
           0,

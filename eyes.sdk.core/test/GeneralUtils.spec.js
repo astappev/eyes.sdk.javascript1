@@ -35,6 +35,9 @@ describe('GeneralUtils', () => {
     it('should return the correct Url when given multiple suffixes and query params', () => {
       assert.equal(GeneralUtils.urlConcat('http://www.applitools.com/', '/subdomain/', '?param=1'), 'http://www.applitools.com/subdomain?param=1');
     });
+    it('concatenate suffixes without slashes', () => {
+      assert.equal(GeneralUtils.urlConcat('http://www.applitools.com/', 'api', '/sessions/', 1233, 'create'), 'http://www.applitools.com/api/sessions/1233/create');
+    });
   });
 
   describe('toISO8601DateTime()', () => {

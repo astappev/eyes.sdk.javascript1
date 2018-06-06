@@ -225,11 +225,27 @@ class Region {
     return this._left;
   }
 
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @param {number} value
+   */
+  setLeft(value) {
+    this._left = value;
+  }
+
   /**
    * @return {number} The region's top offset.
    */
   getTop() {
     return this._top;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @param {number} value
+   */
+  setTop(value) {
+    this._top = value;
   }
 
   /**
@@ -253,6 +269,14 @@ class Region {
     return this._width;
   }
 
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @param {number} value
+   */
+  setWidth(value) {
+    this._width = value;
+  }
+
   /**
    * @return {number} The region's height.
    */
@@ -260,11 +284,27 @@ class Region {
     return this._height;
   }
 
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @param {number} value
+   */
+  setHeight(value) {
+    this._height = value;
+  }
+
   /**
    * @return {CoordinatesType} The region's coordinatesType.
    */
   getCoordinatesType() {
     return this._coordinatesType;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @param {CoordinatesType} value
+   */
+  setCoordinatesType(value) {
+    this._coordinatesType = value;
   }
 
   /**
@@ -337,10 +377,10 @@ class Region {
   }
 
   /**
-   * @return {boolean} {@code true} if the region`s size is 0; {@code false} otherwise.
+   * @return {boolean} {@code true} if the region's size is 0, false otherwise.
    */
   isSizeEmpty() {
-    return (this.getWidth() === Region.EMPTY.getWidth() || this.getHeight() === Region.EMPTY.getHeight());
+    return this.getWidth() <= 0 || this.getHeight() <= 0;
   }
 
   /**
@@ -500,7 +540,13 @@ class Region {
 
   /** @override */
   toJSON() {
-    return { left: this._left, top: this._top, width: this._width, height: this._height };
+    return {
+      left: this._left,
+      top: this._top,
+      width: this._width,
+      height: this._height,
+      coordinatesType: this._coordinatesType,
+    };
   }
 
   /** @override */

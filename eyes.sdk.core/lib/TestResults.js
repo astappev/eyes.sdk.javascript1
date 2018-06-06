@@ -220,6 +220,7 @@ class StepInfo {
  */
 class TestResults {
   constructor() {
+    this._id = null;
     this._name = null;
     this._secretToken = null;
     // this._id = null;
@@ -266,6 +267,18 @@ class TestResults {
       stepsInfo: steps => Array.from(steps)
         .map(step => StepInfo.fromObject(step)),
     });
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /** @return {string} */
+  getId() {
+    return this._id;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /** @param {string} value */
+  setId(value) {
+    this._id = value;
   }
 
   // noinspection JSUnusedGlobalSymbols

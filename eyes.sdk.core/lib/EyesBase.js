@@ -115,6 +115,7 @@ class EyesBase {
     this._failureReports = FailureReports.ON_CLOSE;
     /** @type {ImageMatchSettings} */
     this._defaultMatchSettings = new ImageMatchSettings();
+    this._defaultMatchSettings.setIgnoreCaret(true);
 
     /** @type {Trigger[]} */
     this._userInputs = [];
@@ -185,22 +186,41 @@ class EyesBase {
     this._autSessionId = undefined;
   }
 
-  /** @private */
-  _initProviders() {
-    // TODO: do we need to reset all the providers when user call to open? It may be unexpected.
-    /** @type {PropertyHandler<ScaleProvider>} */
-    this._scaleProviderHandler = new SimplePropertyHandler();
-    this._scaleProviderHandler.set(new NullScaleProvider());
-    /** @type {PositionProvider} */
-    this._positionProvider = new InvalidPositionProvider();
-    /** @type {PropertyHandler<RectangleSize>} */
-    this._viewportSizeHandler = new SimplePropertyHandler();
-    this._viewportSizeHandler.set(null);
+  // noinspection FunctionWithMoreThanThreeNegationsJS
+  /**
+   * @param {boolean} [hardReset=false] If false, init providers only if they're not initialized.
+   * @private
+   */
+  _initProviders(hardReset = false) {
+    if (hardReset) {
+      this._scaleProviderHandler = undefined;
+      this._cutProviderHandler = undefined;
+      this._positionProvider = undefined;
+      this._viewportSizeHandler = undefined;
+      this._debugScreenshotsProvider = undefined;
+    }
+
+    if (!this._scaleProviderHandler) {
+      /** @type {PropertyHandler<ScaleProvider>} */
+      this._scaleProviderHandler = new SimplePropertyHandler();
+      this._scaleProviderHandler.set(new NullScaleProvider());
+    }
 
     if (!this._cutProviderHandler) {
       /** @type {PropertyHandler<CutProvider>} */
       this._cutProviderHandler = new SimplePropertyHandler();
       this._cutProviderHandler.set(new NullCutProvider());
+    }
+
+    if (!this._positionProvider) {
+      /** @type {PositionProvider} */
+      this._positionProvider = new InvalidPositionProvider();
+    }
+
+    if (!this._viewportSizeHandler) {
+      /** @type {PropertyHandler<RectangleSize>} */
+      this._viewportSizeHandler = new SimplePropertyHandler();
+      this._viewportSizeHandler.set(null);
     }
 
     if (!this._debugScreenshotsProvider) {
@@ -658,6 +678,13 @@ class EyesBase {
     }
   }
 
+  /**
+   * @return {boolean}
+   */
+  getIsCutProviderExplicitlySet() {
+    return this._cutProviderHandler && !(this._cutProviderHandler.get() instanceof NullCutProvider);
+  }
+
   // noinspection JSUnusedGlobalSymbols
   /**
    * Manually set the scale ratio for the images being validated.
@@ -927,6 +954,7 @@ class EyesBase {
       that._logger.verbose(`${isAborted ? 'Aborting' : 'Closing'} server session...`);
       that._isOpen = false;
       that.clearUserInputs();
+      that._initProviders(true);
 
       // If a session wasn't started, use empty results.
       if (!that._runningSession) {

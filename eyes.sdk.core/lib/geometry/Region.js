@@ -233,6 +233,20 @@ class Region {
   }
 
   /**
+   * @return {number} The region's right offset.
+   */
+  getRight() {
+    return this._left + this._width;
+  }
+
+  /**
+   * @return {number} The region's bottom offset.
+   */
+  getBottom() {
+    return this._top + this._height;
+  }
+
+  /**
    * @return {number} The region's width.
    */
   getWidth() {

@@ -1685,7 +1685,7 @@ class EyesBase {
     newControl = this._matchWindowTask
       .getLastScreenshot()
       .getIntersectedRegion(newControl, CoordinatesType.SCREENSHOT_AS_IS);
-    if (newControl.isEmpty()) {
+    if (newControl.isSizeEmpty()) {
       this._logger.verbose(`Ignoring '${text}' (out of bounds)`);
       return;
     }
@@ -1743,7 +1743,7 @@ class EyesBase {
       .getIntersectedRegion(control, CoordinatesType.SCREENSHOT_AS_IS);
 
     // If the region is NOT empty, we'll give the coordinates relative to the control.
-    if (!controlScreenshotIntersect.isEmpty()) {
+    if (!controlScreenshotIntersect.isSizeEmpty()) {
       const l = controlScreenshotIntersect.getLocation();
       cursorInScreenshot.offset(-l.getX(), -l.getY());
     }
@@ -1915,7 +1915,7 @@ class EyesBase {
             screenshot = newScreenshot;
 
             // Cropping by region if necessary
-            if (!region.isEmpty()) {
+            if (!region.isSizeEmpty()) {
               return screenshot.getSubScreenshot(region, false).then(subScreenshot => {
                 screenshot = subScreenshot;
                 return that._debugScreenshotsProvider.save(subScreenshot.getImage(), 'SUB_SCREENSHOT');

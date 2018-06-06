@@ -120,8 +120,6 @@ class EyesBase {
     this._userInputs = [];
     /** @type {PropertyData[]} */
     this._properties = [];
-    /** @type {boolean} */
-    this._render = false;
 
     /** @type {boolean} */
     this._useImageDeltaCompression = true;
@@ -154,6 +152,8 @@ class EyesBase {
 
     /** @type {boolean} */ this._isOpen = undefined;
     /** @type {string} */ this._agentId = undefined;
+    /** @type {boolean} */ this._render = false;
+    /** @type {boolean} */ this._saveDiffs = undefined;
 
     /** @type {SessionType} */ this._sessionType = undefined;
     /** @type {string} */ this._testName = undefined;
@@ -714,6 +714,24 @@ class EyesBase {
    */
   getRender() {
     return this._render;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * Automatically save differences as a baseline.
+   *
+   * @param {boolean} saveDiffs Sets whether to automatically save differences as baseline.
+   */
+  setSaveDiffs(saveDiffs) {
+    this._saveDiffs = saveDiffs;
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * @return {boolean} whether to automatically save differences as baseline.
+   */
+  getSaveDiffs() {
+    return this._saveDiffs;
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -1290,7 +1308,7 @@ class EyesBase {
           that.getBaseAgentId(),
           that._sessionType,
           that.getAppName(),
-          null,
+          undefined,
           that._testName,
           that.getBatch(),
           that._baselineEnvName,
@@ -1302,8 +1320,9 @@ class EyesBase {
           that.getBaselineBranchName(),
           that._compareWithParentBranch,
           that._ignoreBaseline,
-          that._properties,
-          that._render
+          that._render,
+          that._saveDiffs,
+          that._properties
         );
 
         const outputProvider = new AppOutputProvider();
@@ -1831,8 +1850,9 @@ class EyesBase {
           that.getBaselineBranchName(),
           that._compareWithParentBranch,
           that._ignoreBaseline,
-          that._properties,
-          that._render
+          that._render,
+          that._saveDiffs,
+          that._properties
         );
 
         that._logger.verbose('Starting server session...');

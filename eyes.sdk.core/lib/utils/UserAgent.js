@@ -125,7 +125,7 @@ class UserAgent {
       result._OS = OSNames.Windows;
       result._OSMajorVersion = '4';
       result._OSMinorVersion = '0';
-    } else if (result._OS === 'Mac_PowerPC') {
+    } else if (result._OS === 'Mac_PowerPC' || result._OS === 'Mac OS X') {
       result._OS = OSNames.Macintosh;
     } else if (result._OS === 'CrOS') {
       result._OS = OSNames.ChromeOS;

@@ -630,10 +630,15 @@ class TestResults {
   }
 
   /** @override */
+  toJSON() {
+    return GeneralUtils.toPlain(this);
+  }
+
+  /** @override */
   toString() {
     const isNewTestStr = this._isNew ? 'New test' : 'Existing test';
     return `${isNewTestStr} [steps: ${this._steps}, matches: ${this._matches}, mismatches: ${this._mismatches}, ` +
-      `missing: ${this._missing}] , URL: ${this._url}, status: ${this._status}`;
+      `missing: ${this._missing}] , URL: ${this._url}, status: ${this._status}]`;
   }
 }
 

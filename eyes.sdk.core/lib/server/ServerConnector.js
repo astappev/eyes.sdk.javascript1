@@ -366,9 +366,9 @@ class ServerConnector {
     return sendRequest(that, 'startSession', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK, HTTP_STATUS_CODES.CREATED];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.startSession - post succeeded', response.data);
         const runningSession = RunningSession.fromObject(response.data);
         runningSession.setNewSession(response.status === HTTP_STATUS_CODES.CREATED);
+        that._logger.verbose('ServerConnector.startSession - post succeeded', runningSession);
         return runningSession;
       }
 
@@ -403,8 +403,9 @@ class ServerConnector {
     return sendLongRequest(that, 'stopSession', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.stopSession - post succeeded', response.data);
-        return TestResults.fromObject(response.data);
+        const testResults = TestResults.fromObject(response.data);
+        that._logger.verbose('ServerConnector.stopSession - post succeeded', testResults);
+        return testResults;
       }
 
       throw new Error(`ServerConnector.stopSession - unexpected status (${response.statusText})`);
@@ -446,8 +447,9 @@ class ServerConnector {
     return sendLongRequest(that, 'matchWindow', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.matchWindow - post succeeded', response.data);
-        return MatchResult.fromObject(response.data);
+        const matchResult = MatchResult.fromObject(response.data);
+        that._logger.verbose('ServerConnector.matchWindow - post succeeded', matchResult);
+        return matchResult;
       }
 
       throw new Error(`ServerConnector.matchWindow - unexpected status (${response.statusText})`);
@@ -487,8 +489,9 @@ class ServerConnector {
     return sendLongRequest(that, 'matchSingleWindow', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.matchSingleWindow - post succeeded', response.data);
-        return TestResults.fromObject(response.data);
+        const testResults = TestResults.fromObject(response.data);
+        that._logger.verbose('ServerConnector.matchSingleWindow - post succeeded', testResults);
+        return testResults;
       }
 
       throw new Error(`ServerConnector.matchSingleWindow - unexpected status (${response.statusText})`);
@@ -525,8 +528,9 @@ class ServerConnector {
     return sendLongRequest(that, 'replaceWindow', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.replaceWindow - post succeeded', response.data);
-        return MatchResult.fromObject(response.data);
+        const matchResult = MatchResult.fromObject(response.data);
+        that._logger.verbose('ServerConnector.replaceWindow - post succeeded', matchResult);
+        return matchResult;
       }
 
       throw new Error(`ServerConnector.replaceWindow - unexpected status (${response.statusText})`);
@@ -554,8 +558,9 @@ class ServerConnector {
     return sendRequest(that, 'renderInfo', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.renderInfo - post succeeded', response.data);
-        return RenderingInfo.fromObject(response.data);
+        const renderingInfo = RenderingInfo.fromObject(response.data);
+        that._logger.verbose('ServerConnector.renderInfo - post succeeded', renderingInfo);
+        return renderingInfo;
       }
 
       throw new Error(`ServerConnector.renderInfo - unexpected status (${response.statusText})`);
@@ -586,13 +591,13 @@ class ServerConnector {
     return sendRequest(that, 'render', options).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.render - post succeeded', response.data);
-
-        if (isBatch) {
-          return Array.from(response.data).map(resultsData => RunningRender.fromObject(resultsData));
+        let runningRender = Array.from(response.data).map(resultsData => RunningRender.fromObject(resultsData));
+        if (!isBatch) {
+          runningRender = runningRender[0]; // eslint-disable-line prefer-destructuring
         }
 
-        return RunningRender.fromObject(response.data[0]);
+        that._logger.verbose('ServerConnector.render - post succeeded', runningRender);
+        return runningRender;
       }
 
       throw new Error(`ServerConnector.render - unexpected status (${response.statusText})`);
@@ -715,13 +720,13 @@ class ServerConnector {
     return promise.then(() => sendRequest(that, 'renderStatus', options, 3, true).then(response => {
       const validStatusCodes = [HTTP_STATUS_CODES.OK];
       if (validStatusCodes.includes(response.status)) {
-        that._logger.verbose('ServerConnector.renderStatus - get succeeded', response.data);
-
-        if (isBatch) {
-          return Array.from(response.data).map(resultsData => RenderStatusResults.fromObject(resultsData));
+        let renderStatus = Array.from(response.data).map(resultsData => RenderStatusResults.fromObject(resultsData));
+        if (!isBatch) {
+          renderStatus = renderStatus[0]; // eslint-disable-line prefer-destructuring
         }
 
-        return RenderStatusResults.fromObject(response.data[0]);
+        that._logger.verbose('ServerConnector.renderStatus - get succeeded', renderStatus);
+        return renderStatus;
       }
 
       throw new Error(`ServerConnector.renderStatus - unexpected status (${response.statusText})`);

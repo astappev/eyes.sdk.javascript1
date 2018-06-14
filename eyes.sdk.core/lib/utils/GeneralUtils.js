@@ -295,6 +295,10 @@ class GeneralUtils {
     return args
       .map(arg => {
         if (typeof arg === 'object') {
+          if (typeof arg.toString === 'function') {
+            return arg.toString();
+          }
+
           return JSON.stringify(arg);
         }
 
